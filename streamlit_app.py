@@ -3,6 +3,7 @@ import torch
 import cv2
 import numpy as np
 import time
+import json
 from collections import defaultdict
 
 # Load YOLOv5 model
@@ -65,6 +66,7 @@ def main():
     
     # Sidebar options
     st.sidebar.title("Options")
+    btn = st.button("Export Object Counts as JSON")
     confidence_threshold = st.sidebar.slider("Confidence threshold", 0.1, 1.0, 0.5, 0.1)
     
     # Load YOLOv5 model
@@ -72,6 +74,7 @@ def main():
 
     # Start video stream
     run_video = st.checkbox("Start Video Stream")
+
 
     if run_video:
         cap = cv2.VideoCapture(0)  # Use webcam (index 0)
@@ -106,8 +109,15 @@ def main():
             # To allow Streamlit to handle UI events
             if not run_video:
                 break
-
+            
         cap.release()
+
+        if btn:
+            json_data = json.dumps(object_counts, indent=4)
+            with open("object_counts.json", "w") as json_file:
+                json_file.write(json_data)
+            st.success("Object counts exported as object_counts.json")
+
 
 if __name__ == '__main__':
     main()
